@@ -31,29 +31,12 @@ public class Server {
         }
     }
 
-    public void privateMsg (ClientHandler sender, String receiverNick, String msg) {
-        if (sender.getNickname().equals(receiverNick)) {
-            sender.sendMsg("Заметка: " + msg);
-            return;
-        }
-        for (ClientHandler o : clients) {
-            if (o.getNickname().equals(receiverNick)) {
-                o.sendMsg("От " + sender.getNickname() + ": " + msg);
-                sender.sendMsg("Для " + receiverNick + ": " + msg);
-                return;
-            }
-        }
-        sender.sendMsg("Пользователь " + receiverNick + " не найден.");
-    }
-
     public void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
-        broadcastClientsList();
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
-        broadcastClientsList();
     }
 
     public AuthService getAuthService() {
@@ -67,21 +50,5 @@ public class Server {
             }
         }
         return false;
-    }
-
-    public void broadcastClientsList() {
-        StringBuilder sb = new StringBuilder(15 * clients.size());
-            sb.append("/clients ");
-            // 'clients '
-            for (ClientHandler o : clients) {
-                sb.append(o.getNickname()).append(" ");
-            }
-            // 'clients nick1 nick2 nick3 '
-        sb.setLength(sb.length() - 1);
-            // 'clients nick1 nick2 nick3'
-        String out = sb.toString();
-        for (ClientHandler o : clients) {
-            o.sendMsg(out);
-        }
     }
 }

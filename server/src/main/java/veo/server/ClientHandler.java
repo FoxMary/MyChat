@@ -32,26 +32,18 @@ public class ClientHandler {
                         String nick = server.getAuthService().getNicknameByLoginAndPassword(tokens[1], tokens[2]);
                         if (nick != null && !server.isNickBusy(nick)) {
                             sendMsg("/authok " + nick);
-                            nickname = nick;
                             server.subscribe(this);
+                            nickname = nick;
                             break;
                         }
                         }
                     }
                     while (true) {
                         String msg = in.readUTF();                                                                        //ждет пока клиент пришлет сообщение (nextLine() - считывание строчки текста
-                        if (msg.startsWith("/")) {
-                            if (msg.equals("/end")) {                                                                              //если клиент прислал команду /end  - завершаем цикл прослушивания
-                                sendMsg("/end");
-                                break;
-                            }
-                            if (msg.startsWith("/w ")) {
-                                String[] tokens = msg.split("\\s", 3);
-                                server.privateMsg(this, tokens[1], tokens[2]);
-                            }
-                        } else {
-                            server.broadcastMsg(nickname + ": " + msg);
+                        if (msg.equals("/end")) {                                                                              //если клиент прислал команду /end  - завершаем цикл прослушивания
+                            break;
                         }
+                        server.broadcastMsg(nickname + ": " + msg);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
