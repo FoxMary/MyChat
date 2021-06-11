@@ -10,10 +10,34 @@ public class Network  {
     private static DataInputStream in;
     private static DataOutputStream out;
 
-    public static Callback callOnMsgReceived;
-    public static Callback callOnAuthentidicated;
-    public static Callback callOnException;
-    public static Callback callOnCloseConnection;
+    private static Callback callOnMsgReceived;
+    private static Callback callOnAuthentidicated;
+    private static Callback callOnException;
+    private static Callback callOnCloseConnection;
+
+    static {
+        Callback empty = args -> { };
+        callOnMsgReceived = empty;
+        callOnException = empty;
+        callOnCloseConnection = empty;
+        callOnAuthentidicated = empty;
+    }
+
+    public static void setCallOnMsgReceived(Callback callOnMsgReceived) {
+        Network.callOnMsgReceived = callOnMsgReceived;
+    }
+
+    public static void setCallOnAuthentidicated(Callback callOnAuthentidicated) {
+        Network.callOnAuthentidicated = callOnAuthentidicated;
+    }
+
+    public static void setCallOnException(Callback callOnException) {
+        Network.callOnException = callOnException;
+    }
+
+    public static void setCallOnCloseConnection(Callback callOnCloseConnection) {
+        Network.callOnCloseConnection = callOnCloseConnection;
+    }
 
     public static void sendAuth(String login, String password) {
         try {
@@ -34,16 +58,19 @@ public class Network  {
                     while (true) {
                         String msg = in.readUTF();
                         if (msg.startsWith("/authok ")) {
-                            callOnAuthentidicated.collback(msg.split("\\s")[1]);
+                            callOnAuthentidicated.callback(msg.split("\\s")[1]);
                             break;
                         }
                     }
                     while (true) {
                         String msg = in.readUTF();
-                        callOnMsgReceived.collback(msg);
+                        if (msg.equals("/end")) {
+                            break;
+                        }
+                        callOnMsgReceived.callback(msg);
                     }
                 } catch (IOException e) {
-                    callOnException.collback("Соединение с сервером разорвано");
+                    callOnException.callback("Соединение с сервером разорвано");
                 } finally {
                     closeConnection();
                 }
@@ -66,7 +93,7 @@ public class Network  {
     }
 
     public static void closeConnection () {
-        callOnCloseConnection.collback();
+        callOnCloseConnection.callback();
         try {
             in.close();
         } catch (IOException e) {

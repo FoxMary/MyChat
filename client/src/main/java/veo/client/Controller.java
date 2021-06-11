@@ -49,12 +49,11 @@ public class Controller implements Initializable {      //инициализац
                 msgField.requestFocus();            //при фокусе выделяется все содержимое
                 msgField.selectEnd();               //курсор ставится в конец
             }
-
         });
         linkCallbacks();
     }
 
-    public  void sendAuth(String login, String password) {
+    public void sendAuth() {
         Network.sendAuth(loginField.getText(), passField.getText());
         loginField.clear();
         passField.clear();
@@ -75,13 +74,13 @@ public class Controller implements Initializable {      //инициализац
     }
 
     public void linkCallbacks() {
-        Network.callOnException = args -> showAlert(args[0].toString());
-        Network.callOnCloseConnection = args -> setAuthentificated(false);
-        Network.callOnAuthentidicated = args -> {
+        Network.setCallOnException(args -> showAlert(args[0].toString()));
+        Network.setCallOnCloseConnection(args -> setAuthentificated(false));
+        Network.setCallOnAuthentidicated(args -> {
             setAuthentificated(true);
             nickname = args[0].toString();
-        };
-        Network.callOnMsgReceived = args -> {
+        });
+        Network.setCallOnMsgReceived(args -> {
             String msg = args[0].toString();
             if (msg.startsWith("/")) {
                 if (msg.startsWith("/clients ")) {
@@ -93,12 +92,9 @@ public class Controller implements Initializable {      //инициализац
                         }
                     });
                 }
-                if (msg.equals("/end")) {
-                    Network.closeConnection();
-                }
             } else {
                 textArea.appendText(msg + "\n");
             }
-        };
+        });
     }
 }

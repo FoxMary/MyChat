@@ -63,6 +63,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
     public void sendMsg(String msg) {
         try {
             out.writeUTF(msg);

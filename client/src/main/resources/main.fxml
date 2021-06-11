@@ -15,7 +15,7 @@
         <Button text="Войти" HBox.hgrow="ALWAYS" onAction="#sendAuth"/>
     </HBox>
     <HBox VBox.vgrow="ALWAYS" >
-       <TextArea fx:id="textArea" editable="false" />
+       <TextArea fx:id="textArea" editable="false" HBox.hgrow="ALWAYS"/>
         <ListView fx:id="clientsList" minWidth="200" maxWidth="200" />
     </HBox>
     <HBox fx:id="msgPanel">
