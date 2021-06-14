@@ -8,36 +8,94 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>client</artifactId>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <file-name>my-chat-client</file-name>
+        <maven.compiler.release>11</maven.compiler.release>
+        <javafx.version>11.0.2</javafx.version>
+        <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
+        <quarkus.platform.version>1.13.7.Final</quarkus.platform.version>
     </properties>
 
     <dependencies>
+        <!--JavaFX-->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx</artifactId>
-            <version>17-ea+11</version>
-            <type>pom</type>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <finalName>VeoChatClient</finalName>
         <plugins>
+            <!--            Плагин копирует зависимости -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <addParentPoms>true</addParentPoms>
+                            <outputAbsoluteArtifactFilename>true</outputAbsoluteArtifactFilename>
+                            <outputDirectory>${project.basedir}/${outputDirectory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--            Для запуска приложения через плагин maven-->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>${javafx.maven.plugin.version}</version>
                 <configuration>
+                    <mainClass>veo.client.Main</mainClass>
+                </configuration>
+            </plugin>
+            <!--            плагин докачивает в jar недостающие файлы-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>make-jar-with-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <finalName>${file-name}</finalName>
+                    <outputDirectory>${outputDirectory}</outputDirectory>
                     <archive>
                         <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>veo.client.Main</mainClass>
                         </manifest>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>

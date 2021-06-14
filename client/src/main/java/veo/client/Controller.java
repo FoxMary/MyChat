@@ -30,6 +30,7 @@ public class Controller implements Initializable {      //инициализац
 
     public void setAuthentificated(boolean authentificated) {
         this.authentificated = authentificated;
+        this.clientsList = new ListView<>();
         authPanel.setVisible(!authentificated);             //показать\скрыть элемент управления
         authPanel.setManaged(!authentificated);         //показать\скрыть место для элемента управления
         msgPanel.setVisible(authentificated);
